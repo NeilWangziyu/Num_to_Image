@@ -67,25 +67,16 @@ def train(epochs=1, batchSize=128):
 
             imageBatch = X_train[pickup_batch]
 
-            # Generate fake MNIST images
             generatedImages = generator.predict(our_input)
             X = np.concatenate([imageBatch, generatedImages])
 
-            # Labels for generated and real data
-            #             yDis = np.zeros(2*batchSize)
-
             image_outputs = to_categorical(y_train[pickup_batch], inputDim + 1)
-            gen_image_outputs = to_categorical([inputDim] * batchSize, inputDim + 1)  # 10 means 11. 11 means fake.
+            gen_image_outputs = to_categorical([inputDim] * batchSize, inputDim + 1)
             yDis = np.vstack((image_outputs, gen_image_outputs))
-            #             # One-sided label smoothing
-            #             yDis[:batchSize] = 0.9
 
-            # Train discriminator
             discriminator.trainable = True
             dloss = discriminator.train_on_batch(X, yDis)
 
-            # Train generator
-            #             noise = np.random.normal(0, 1, size=[batchSize, randomDim])
             our_input = to_categorical(y_train[pickup_batch], inputDim)
 
             yGen = to_categorical(y_train[pickup_batch], inputDim + 1)

@@ -17,21 +17,22 @@ import argparse
 
 K.set_image_dim_ordering('th')
 
-def create_digit_sequence(number, image_width=10, min_spacing=0, max_spacing=0, save_file_name = "digit_sequence"):
-    """ A function that create an image representing the given number,
-        with random spacing between the digits.
-        Each digit is randomly sampled from the MNIST dataset.
-        Returns an NumPy array representing the image.
-        Parameters
-        ----------
-        number: str
-            A string representing the number, e.g. "14543"
-        image_width: int
-            The image width (in pixel).
-        min_spacing: int
-            The minimum spacing between digits (in pixel).
-        max_spacing: int
-            The maximum spacing between digits (in pixel).
+def create_digit_sequence(number, model="default_model", image_width=10, min_spacing=0, max_spacing=0, save_file_name = "digit_sequence"):
+    """
+    A function that create an image representing the given number,
+    with random spacing between the digits.
+    Each digit is randomly sampled from the MNIST dataset.
+    Returns an NumPy array representing the image.
+    Parameters
+    ----------
+    number: str
+        A string representing the number, e.g. "14543"
+    image_width: int
+        The image width (in pixel).
+    min_spacing: int
+        The minimum spacing between digits (in pixel).
+    max_spacing: int
+        The maximum spacing between digits (in pixel).
     """
 
     if(len(number) == 0):
@@ -43,19 +44,21 @@ def create_digit_sequence(number, image_width=10, min_spacing=0, max_spacing=0, 
             number_list.append(int(each))
     except:
         raise ValueError("Please make sure each number is correctly input")
-
     figsize = (image_width, image_width)
 
     inputDim = 10
 
     model_folder = 'model_saved_for_each_epoch'
-
     # discriminator = load_model('{}/dcgan_discriminator_epoch_75.h5'.format(model_folder))
-    generator = load_model('{}/dcgan_generator_epoch_75.h5'.format(model_folder))
+    generator = load_model('{}/{}.h5'.format(model_folder, model))
 
     generatedImages = generator.predict(to_categorical(number_list, inputDim))
 
-    dim = (1, 10)
+    dim = (1, len(number_list))
+
+    wspace = (min_spacing+max_spacing)/2  # the amount of width reserved for blank space between subplots
+    hspace = (min_spacing+max_spacing)/2  # the amount of height reserved for white space between subplots
+    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=wspace, hspace=hspace)
 
     plt.figure(figsize=figsize)
     for i in range(generatedImages.shape[0]):
@@ -73,6 +76,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='train the GAN model')
     parser.add_argument('--number', default="25", help="input number of data")
+    parser.add_argument('--model', default="default_model", help="the model used for generate number")
     parser.add_argument('--image_width', default="10", help="the size of an image")
     parser.add_argument('--min_spacing', default="0", help="the min space between images")
     parser.add_argument('--max_spacing', default="0", help="the max space between images")
@@ -81,12 +85,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     number = args.number
+    model = args.model
     image_width = int(args.image_width)
     min_spacing = int(args.min_spacing)
     max_spacing = int(args.max_spacing)
     save_file_name = args.save_file_name
 
-    create_digit_sequence(number=number, image_width=10, save_file_name=save_file_name)
+    create_digit_sequence(number=number, model = model, image_width=10, save_file_name=save_file_name)
 
 
 
