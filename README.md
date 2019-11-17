@@ -45,3 +45,9 @@ The numbers that generated at some certain check-point
 
 * Epoch number:24
 ![figure](images_saved_for_each_epoch/dcgan_generated_image_epoch_24.png)
+
+## Result
+
+I guess they dont like my program
+
+And I will no longer update this repository
